@@ -1,9 +1,16 @@
 from ctypes import windll
 from ctypes.wintypes import HWND
+
+import mountHook as hook
+from ctypes import windll
+from ctypes.wintypes import HWND
 import string
 import time
 import win32gui
+import win32api
+import win32con
 
+win32gui.SendMessage(0, 0x100, 0x41, 0)
 PostMessageW = windll.user32.PostMessageW
 MapVirtualKeyW = windll.user32.MapVirtualKeyW
 VkKeyScanA = windll.user32.VkKeyScanA
@@ -106,6 +113,9 @@ def key_down(handle: HWND, key: str):
     wparam = vk_code
     lparam = (scan_code << 16) | 1
     PostMessageW(handle, WM_KEYDOWN, wparam, lparam)
+    win32api.SendMessage(handle, win32con.WM_KEYDOWN, win32con.VK_SPACE, 0)
+    res1 = win32gui.PostMessage(handle, win32con.WM_KEYDOWN, win32con.VK_SPACE, 0)
+    res2 = win32gui.SendMessage(handle, win32con.WM_KEYDOWN, win32con.VK_SPACE, 0)
 
 
 def key_up(handle: HWND, key: str):
@@ -121,6 +131,17 @@ def key_up(handle: HWND, key: str):
     wparam = vk_code
     lparam = (scan_code << 16) | 0XC0000001
     PostMessageW(handle, WM_KEYUP, wparam, lparam)
+    #
+    win32api.SendMessage(handle, win32con.WM_KEYUP, win32con.VK_SPACE, 0)
+    win32gui.PostMessage(handle, win32con.WM_KEYUP, win32con.VK_SPACE, 0)
+    win32gui.SendMessage(handle, win32con.WM_KEYUP, win32con.VK_SPACE, 0)
+
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
@@ -130,14 +151,15 @@ if __name__ == "__main__":
         # 不是管理员就提权
         windll.shell32.ShellExecuteW(
             None, "runas", sys.executable, __file__, None, 1)
-
-    import cv2
-    # handle = windll.user32.FindWindowW(None, "消息接收窗口")
-    handle = 199362
+    # hook.start()
+    handle = windll.user32.FindWindowW(None, "新建文本文档.txt")
     # 通关句柄id获取句柄
 
+    # 向这个handle打字helloword
+
+    time.sleep(10)
 
     # 控制角色向前移动两秒
-    key_down(handle, 'numpad0')
-    time.sleep(2)
-    key_up(handle, 'numpad0')
+    key_down(handle, 'space')
+    time.sleep(1)
+    key_up(handle, 'space')
